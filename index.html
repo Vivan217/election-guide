@@ -139,13 +139,13 @@
   </div>
 
   <div id="api-banner">
-    <div class="bt">&#128273; Gemini API Key (free)</div>
+    <div class="bt">&#128273; Groq API Key (free)</div>
     <div class="br">
-      <input type="password" id="kInput" placeholder="AIzaSy..." />
+      <input type="password" id="kInput" placeholder="gsk_..." />
       <button onclick="saveKey()">Save</button>
     </div>
     <div class="bh">
-      Get free key: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> &rarr; "Get API Key" &rarr; Copy &rarr; Paste above
+      Get free key: <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a> &rarr; "Get API Key" &rarr; Copy &rarr; Paste above
     </div>
   </div>
 
@@ -161,7 +161,7 @@
     <div class="msg bot">
       <div class="av bot">EG</div>
       <div class="bub bot">
-        <strong>Welcome to the Election Guide!</strong> I can walk you through the complete election process — registration, primaries, election day, vote counting, the electoral college, and more. Add your free Gemini API key above, then ask anything!
+        <strong>Welcome to the Election Guide!</strong> I can walk you through the complete election process — registration, primaries, election day, vote counting, the electoral college, and more. Add your free Groq API key above, then ask anything!
       </div>
     </div>
   </div>
@@ -192,14 +192,14 @@ Step 2: Title | Description
 
 const COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#7F77DD','#639922'];
 let hist = [], busy = false;
-let key = localStorage.getItem('eg_gkey') || '';
+let key = localStorage.getItem('eg_groqkey') || '';
 if (key) document.getElementById('api-banner').style.display = 'none';
 
 function saveKey() {
   const k = document.getElementById('kInput').value.trim();
-  if (!k) return alert('Please paste your Gemini API key!');
+  if (!k) return alert('Please paste your Groq API key!');
   key = k;
-  localStorage.setItem('eg_gkey', k);
+  localStorage.setItem('eg_groqkey', k);
   document.getElementById('api-banner').style.display = 'none';
   document.getElementById('inp').focus();
 }
@@ -258,7 +258,7 @@ async function send() {
   hist.push({ role:'user', parts:[{text}] });
   showTyping();
   try {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`;
+    const url=`https://api.groq.com/openai/v1/chat/completions`;
     const res=await fetch(url,{
       method:'POST',
       headers:{'Content-Type':'application/json'},

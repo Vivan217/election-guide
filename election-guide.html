@@ -139,13 +139,13 @@
   </div>
 
   <div id="api-banner">
-    <div class="bt">&#128273; Gemini API Key (free)</div>
+    <div class="bt">&#128273; Groq API Key (free)</div>
     <div class="br">
-      <input type="password" id="kInput" placeholder="AIzaSy..." />
+      <input type="password" id="kInput" placeholder="gsk_..." />
       <button onclick="saveKey()">Save</button>
     </div>
     <div class="bh">
-      Get free key: <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> &rarr; "Get API Key" &rarr; Copy &rarr; Paste above
+      Get free key: <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a> &rarr; "Create API key" &rarr; Copy &rarr; Paste above
     </div>
   </div>
 
@@ -192,14 +192,14 @@ Step 2: Title | Description
 
 const COLORS = ['#378ADD','#1D9E75','#BA7517','#D4537E','#7F77DD','#639922'];
 let hist = [], busy = false;
-let key = localStorage.getItem('eg_gkey') || '';
+let key = localStorage.getItem('eg_groqkey') || '';
 if (key) document.getElementById('api-banner').style.display = 'none';
 
 function saveKey() {
   const k = document.getElementById('kInput').value.trim();
-  if (!k) return alert('Please paste your Gemini API key!');
+  if (!k) return alert('Please paste your Groq API key!');
   key = k;
-  localStorage.setItem('eg_gkey', k);
+  localStorage.setItem('eg_groqkey', k);
   document.getElementById('api-banner').style.display = 'none';
   document.getElementById('inp').focus();
 }
@@ -255,23 +255,22 @@ async function send() {
   busy=true; sBtn.disabled=true;
   inpEl.value=''; inpEl.style.height='auto';
   addMsg('user', text);
-  hist.push({ role:'user', parts:[{text}] });
+  hist.push({ role:'user', content:text });
   showTyping();
   try {
-    const url=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${key}`;
-    const res=await fetch(url,{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
       body:JSON.stringify({
-        system_instruction:{parts:[{text:SYS}]},
-        contents:hist,
-        generationConfig:{maxOutputTokens:800,temperature:0.7}
+        model:'llama-3.3-70b-versatile',
+        messages:[{role:'system',content:SYS},...hist],
+        max_tokens:800,temperature:0.7
       })
     });
     const data=await res.json();
     if (data.error) throw new Error(data.error.message);
-    const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response. Try again.';
-    hist.push({role:'model',parts:[{text:reply}]});
+    const reply=data.choices?.[0]?.message?.content||'No response. Try again.';
+    hist.push({role:'assistant',content:reply});
     removeTyping();
     addMsg('bot', parse(reply));
   } catch(e) {

@@ -255,7 +255,7 @@ async function send() {
   busy=true; sBtn.disabled=true;
   inpEl.value=''; inpEl.style.height='auto';
   addMsg('user', text);
-  hist.push({ role:'user', parts:[{text}] });
+  hist.push({ role:'user', content:text });
   showTyping();
   try {
     const url=`https://api.groq.com/openai/v1/chat/completions`;
